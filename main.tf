@@ -30,3 +30,35 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
   bucket = aws_s3_bucket.myS3bucket.id
   acl    = "public-read"
 }
+
+##adding object to bucket 
+resource "aws_s3_object" "index" {
+   key                    = "index.html"
+  bucket                 = aws_s3_bucket.myS3bucket.id
+  source                 = "index.html"
+  acl                    = "public-read"
+  content_type           = "text/html"
+}
+
+resource "aws_s3_object" "error" {
+  key                    = "error.html"
+  bucket                 = aws_s3_bucket.myS3bucket.id
+  source                 = "error.html"  ## file at current location
+  acl                    = "public-read"
+  content_type           = "text/html"
+}
+
+##s3 static website configuration
+resource "aws_s3_bucket_website_configuration" "website_configuration" {
+  bucket = aws_s3_bucket.myS3bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+
+  depends_on = [ aws_s3_bucket_acl.bucket_acl ]
+}
